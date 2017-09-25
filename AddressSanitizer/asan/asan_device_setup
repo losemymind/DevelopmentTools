@@ -162,7 +162,8 @@ fi
 
 cat <<EOF >"$TMPDIR/asanwrapper"
 #!/system/bin/sh
-LD_PRELOAD=$ASAN_RT \\
+ASAN_OPTIONS=$ASAN_OPTIONS \\
+LD_PRELOAD=\$LD_PRELOAD:$ASAN_RT \\
 exec \$@
 EOF
 
