@@ -1,0 +1,88 @@
+#!/bin/bash
+
+set -e
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+
+revert=no
+package=
+device=
+
+function usage {
+    echo "usage: $0 [--revert] [--device device-id] [--package package-name]"
+    echo "  --revert: Uninstall valgrind from the device."
+    echo "  --package: The application package name."
+    echo "  --device: Install to the given device. Use 'adb devices' to find"
+    echo "            device-id."
+    echo
+    exit 1
+}
+
+while [[ $# > 0 ]]; do
+  case $1 in
+    --revert)
+      revert=yes
+      ;;
+    --package)
+      shift
+      if [[ $# == 0 ]]; then
+        echo "--package requires an argument."
+        exit 1
+      fi
+      package="$1"
+      ;;
+    --device)
+      shift
+      if [[ $# == 0 ]]; then
+        echo "--device requires an argument."
+        exit 1
+      fi
+      device="$1"
+      ;;
+    *)
+      usage
+      ;;
+  esac
+  shift
+done
+
+ADB=${ADB:-adb}
+if [[ x$device != x ]]; then
+    ADB="$ADB -s $device"
+fi
+
+echo '>> Remounting /system rw'
+$ADB root
+$ADB wait-for-device
+$ADB remount
+$ADB wait-for-device
+
+if [[ x$revert == xyes ]]; then
+    echo '>> Uninstalling ASan'
+    $ADB shell rm /data/local/Inst
+    $ADB shell rm /system/bin/valgrind_wrapper
+    $ADB shell setprop wrap.$package ""
+    echo '>> Restarting shell'
+    echo '>> Done'
+    exit 0
+fi
+
+cat <<EOF >"$HERE/valgrind_wrapper"
+#!/system/bin/sh
+VGPARAMS='-v --error-limit=no --trace-children=yes --track-fds=yes --log-file=/sdcard/$package.%p.valgrind.log --tool=memcheck --leak-check=full --track-origins=yes'  
+export TMPDIR=/data/data/$package  
+exec /data/local/Inst/bin/valgrind $VGPARAMS $*
+EOF
+
+$ADB push Inst/ /
+$ADB push $HERE/valgrind_wrapper /system/bin/valgrind_wrapper
+
+$ADB shell chown root.shell /data/local/Inst/bin/valgrind /system/bin/valgrind_wrapper
+$ADB shell chmod 644 /data/local/Inst/bin/valgrind
+$ADB shell chmod 755 /system/bin/valgrind_wrapper
+
+$ADB shell su -c "setprop wrap.$package 'logwrapper /data/local/valgrind_wrapper'"
+echo "wrap.$package: $(adb shell getprop wrap.$package)"
+$ADB shell am force-stop $package
+$ADB logcat -c
+$ADB logcat

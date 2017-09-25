@@ -171,13 +171,9 @@ echo '>> Pushing files to the device'
 $ADB push "$TMPDIR/$ASAN_RT" /system/lib/
 $ADB push "$TMPDIR/asanwrapper" /system/bin/asanwrapper
 
-$ADB shell chown root.shell \
-    /system/lib/"$ASAN_RT" \
-    /system/bin/asanwrapper
-$ADB shell chmod 644 \
-    /system/lib/"$ASAN_RT"
-$ADB shell chmod 755 \
-    /system/bin/asanwrapper
+$ADB shell chown root.shell /system/lib/"$ASAN_RT" /system/bin/asanwrapper
+$ADB shell chmod 644 /system/lib/"$ASAN_RT"
+$ADB shell chmod 755 /system/bin/asanwrapper
 
 $ADB shell setenforce 0 #disable SELinux
 $ADB shell setprop wrap.$package "asanwrapper"
