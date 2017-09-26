@@ -1,14 +1,4 @@
 #!/bin/bash
-#===- lib/asan/scripts/asan_device_setup -----------------------------------===#
-#
-#                     The LLVM Compiler Infrastructure
-#
-# This file is distributed under the University of Illinois Open Source
-# License. See LICENSE.TXT for details.
-#
-# Prepare Android device to run ASan applications.
-#
-#===------------------------------------------------------------------------===#
 
 set -e
 
