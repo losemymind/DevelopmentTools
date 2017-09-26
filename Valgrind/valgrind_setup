@@ -51,6 +51,8 @@ if [[ x$device != x ]]; then
     ADB="$ADB -s $device"
 fi
 
+$ADB shell am force-stop $package
+
 echo '>> Remounting /system rw'
 $ADB root
 $ADB wait-for-device
@@ -91,9 +93,7 @@ $ADB shell chmod 777 /data/local/Inst/bin/*
 $ADB shell chmod 777 /data/local/Inst/lib/*
 $ADB shell chmod 777 /data/local/Inst/lib/valgrind/*-arm-linux
 $ADB shell chmod 777 /data/local/valgrind_wrapper
-
 $ADB shell su -c "setprop wrap.$package 'logwrapper /data/local/valgrind_wrapper'"
 echo "wrap.$package: $(adb shell getprop wrap.$package)"
-$ADB shell am force-stop $package
 # $ADB logcat -c
 # $ADB logcat

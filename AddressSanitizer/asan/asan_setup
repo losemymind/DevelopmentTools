@@ -96,6 +96,8 @@ if [[ x$device != x ]]; then
     ADB="$ADB -s $device"
 fi
 
+$ADB shell am force-stop $package
+
 echo '>> Remounting /system rw'
 $ADB root
 $ADB wait-for-device
@@ -178,9 +180,9 @@ $ADB shell chmod 755 /system/bin/asanwrapper
 $ADB shell setenforce 0 #disable SELinux
 $ADB shell setprop wrap.$package "asanwrapper"
 echo "wrap.$package: $(adb shell getprop wrap.$package)"
-#rm -r "$TMPDIRBASE"
-echo '>> Restarting shell (asynchronous)'
-echo '>> Please wait until the device restarts'
-$ADB shell stop
-$ADB shell start
+# rm -r "$TMPDIRBASE"
+# echo '>> Restarting shell (asynchronous)'
+# echo '>> Please wait until the device restarts'
+# $ADB shell stop
+# $ADB shell start
 
