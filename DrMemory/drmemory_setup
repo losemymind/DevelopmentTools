@@ -1,0 +1,87 @@
+#!/bin/bash
+
+set -e
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+
+revert=no
+package=
+device=
+
+function usage {
+    echo "usage: $0 [--revert] [--device device-id] [--package package-name]"
+    echo "  --revert: Uninstall valgrind from the device."
+    echo "  --package: The application package name."
+    echo "  --device: Install to the given device. Use 'adb devices' to find"
+    echo "            device-id."
+    echo
+    exit 1
+}
+
+while [[ $# > 0 ]]; do
+  case $1 in
+    --revert)
+      revert=yes
+      ;;
+    --package)
+      shift
+      if [[ $# == 0 ]]; then
+        echo "--package requires an argument."
+        exit 1
+      fi
+      package="$1"
+      ;;
+    --device)
+      shift
+      if [[ $# == 0 ]]; then
+        echo "--device requires an argument."
+        exit 1
+      fi
+      device="$1"
+      ;;
+    *)
+      usage
+      ;;
+  esac
+  shift
+done
+
+ADB=${ADB:-adb}
+if [[ x$device != x ]]; then
+    ADB="$ADB -s $device"
+fi
+
+$ADB shell am force-stop $package
+
+echo '>> Remounting /system rw'
+$ADB root
+$ADB wait-for-device
+$ADB remount
+$ADB wait-for-device
+
+if [[ x$revert == xyes ]]; then
+    echo '>> Uninstalling ASan'
+    $ADB shell rm /data/local/drmemory/
+    $ADB shell rm /system/xbin/drmemory_wrapper
+    $ADB shell setprop wrap.$package ""
+    echo '>> Restarting shell'
+    echo '>> Done'
+    exit 0
+fi
+
+cat <<EOF >"$HERE/drmemory_wrapper"
+#!/system/bin/sh
+export TMPDIR=/data/data/$package  
+exec /data/local/drmemory/bin/drmemory -- \$@
+EOF
+
+$ADB push $HERE/drmemory/ /data/local/drmemory/
+$ADB push $HERE/drmemory_wrapper /system/xbin/drmemory_wrapper
+
+$ADB shell chmod -R 777 /data/local/drmemory/
+$ADB shell chmod 777 /system/xbin/drmemory_wrapper
+$ADB shell su -c "setprop wrap.$package 'logwrapper /system/xbin/drmemory_wrapper'"
+echo "wrap.$package: $(adb shell getprop wrap.$package)"
+rm -r $HERE/drmemory_wrapper
+# $ADB logcat -c
+# $ADB logcat

@@ -168,9 +168,9 @@ $ADB shell chmod 644 /system/lib/"$ASAN_RT"
 $ADB shell chmod 755 /system/bin/asanwrapper
 
 $ADB shell setenforce 0 #disable SELinux
-$ADB shell setprop wrap.$package "asanwrapper"
+$ADB shell setprop wrap.$package "logwrapper asanwrapper"
 echo "wrap.$package: $(adb shell getprop wrap.$package)"
-# rm -r "$TMPDIRBASE"
+rm -r "$TMPDIRBASE"
 # echo '>> Restarting shell (asynchronous)'
 # echo '>> Please wait until the device restarts'
 # $ADB shell stop
