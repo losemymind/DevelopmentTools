@@ -1,0 +1,5 @@
+#!/system/bin/sh
+VGPARAMS='-v --error-limit=no --trace-children=yes --track-fds=yes --log-file=/sdcard/com.example.test.%p.valgrind.log --tool=memcheck --leak-check=full --track-origins=yes --show-reachable=yes'
+
+export TMPDIR=/data/data/com.example.test  
+exec /data/local/Inst/bin/valgrind $VGPARAMS $*
