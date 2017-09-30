@@ -1,10 +1,7 @@
 #!/bin/bash
-NDK_PATH=/Users/libo/WorkStation/SDKs/android-ndk-r13b
-VALGRIND_PATH=/Users/libo/WorkStation/GitHub/valgrind
-
-cd $VALGRIND_PATH
+cd /Users/libo/WorkStation/GitHub/valgrind
 export HWKIND=generic
-export NDKROOT=$NDK_PATH
+export NDKROOT=/Users/libo/WorkStation/SDKs/android-ndk-r13b
 export APP_PLATFORM=android-15
 export TOOLCHAIN_SET=arm-linux-androideabi-4.9
 export LOCAL_HOST=darwin-x86_64
