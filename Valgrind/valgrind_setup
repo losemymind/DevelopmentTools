@@ -95,5 +95,6 @@ $ADB shell chmod 777 /data/local/Inst/lib/valgrind/*-arm-linux
 $ADB shell chmod 777 /data/local/valgrind_wrapper
 $ADB shell su -c "setprop wrap.$package 'logwrapper /data/local/valgrind_wrapper'"
 echo "wrap.$package: $(adb shell getprop wrap.$package)"
+rm -r $HERE/valgrind_wrapper
 # $ADB logcat -c
 # $ADB logcat

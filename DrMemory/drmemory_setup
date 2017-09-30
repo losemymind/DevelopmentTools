@@ -82,5 +82,6 @@ $ADB shell chmod -R 777 /data/local/drmemory/
 $ADB shell chmod 777 /system/xbin/drmemory_wrapper
 $ADB shell su -c "setprop wrap.$package 'logwrapper /system/xbin/drmemory_wrapper'"
 echo "wrap.$package: $(adb shell getprop wrap.$package)"
+rm -r $HERE/drmemory_wrapper
 # $ADB logcat -c
 # $ADB logcat
