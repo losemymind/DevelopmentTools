@@ -80,7 +80,7 @@ VGPARAMS='-v \
 --leak-check=full \
 --show-leak-kinds=all \
 --track-origins=yes \
---show-reachable=no'
+--show-reachable=yes'
 
 export TMPDIR=/data/data/$package  
 exec /data/local/Inst/bin/valgrind \$VGPARAMS \$*
