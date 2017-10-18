@@ -72,14 +72,15 @@ fi
 cat <<EOF >"$HERE/valgrind_wrapper"
 #!/system/bin/sh
 VGPARAMS='-v \
+--log-file=/sdcard/$package.%p.valgrind.log \
 --error-limit=no \
 --trace-children=yes \
 --track-fds=yes \
---log-file=/sdcard/$package.%p.valgrind.log \
 --tool=memcheck \
 --leak-check=full \
+--show-leak-kinds=all \
 --track-origins=yes \
---show-reachable=yes'
+--show-reachable=no'
 
 export TMPDIR=/data/data/$package  
 exec /data/local/Inst/bin/valgrind \$VGPARAMS \$*
