@@ -10,6 +10,7 @@ device=
 lib=
 package=
 
+#./asan_setup --package com.example.test --extra-options detect_leaks=1,suppressions=/system/lib/egl/libEGL_tegra.so
 function usage {
     echo "usage: $0 [--revert] [--device device-id] [--lib path] [--extra-options options] --package"
     echo "  --revert: Uninstall ASan from the device."
@@ -168,7 +169,6 @@ $ADB shell chmod 644 /system/lib/"$ASAN_RT"
 $ADB shell chmod 755 /system/bin/asanwrapper
 
 $ADB shell setenforce 0 #disable SELinux
-$ADB shell setprop wrap.$package "logwrapper asanwrapper"
 $ADB shell su -c "setprop wrap.$package 'logwrapper asanwrapper'"
 echo "wrap.$package: $(adb shell getprop wrap.$package)"
 rm -r "$TMPDIRBASE"
