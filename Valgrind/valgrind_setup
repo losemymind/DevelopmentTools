@@ -72,11 +72,11 @@ fi
 cat <<EOF >"$HERE/valgrind_wrapper"
 #!/system/bin/sh
 VGPARAMS='-v \
+--tool=memcheck \
 --log-file=/sdcard/$package.%p.valgrind.log \
 --error-limit=no \
 --trace-children=yes \
 --track-fds=yes \
---tool=memcheck \
 --leak-check=full \
 --show-leak-kinds=all \
 --track-origins=yes \
